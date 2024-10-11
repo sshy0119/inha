@@ -1,0 +1,40 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{@index}}"> 
+  <!--target에 staticBackdrop으로 고정되어 있으면 1개의 id에 해당되는 값만 나옴. 그래서 옆에 {{@index}}하면 인덱스에 따라 숫자 커지면서 적용됨.-->
+  정보
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop{{@index}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">도서정보</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4">
+            <img src="{{thumbnail}}" width="100%">
+          </div>
+          <div class="col">
+            <h5>{{title}}</h5>
+            <hr>
+            <div>저자:{{authors}}</div>
+            <div>가격:{{price}}원</div>
+            <div>출판사:{{publisher}}</div>
+            <div>ISBN:{{isbn}}</div>
+            <div>출판일:{{datetime}}</div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div>{{contents}}</div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--위에는 boot strap 컴포넌트 - 모달 - 백드롭 에서 그대로 복사해서 사용한 거임 -->
