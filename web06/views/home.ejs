@@ -1,0 +1,114 @@
+<div class="row">
+    <h1 class="text-center my-5"><%=title%></h1>
+
+    <div class="row mb-2">
+      <form name="frm" class="col-6 col-md-4">
+        <div class="input-group">
+          <input name="query" class="form-control" value="자바">
+          <button class="btn btn-primary">검색</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="div_list" class="row"></div>
+
+    <div class="text-center mt-3">
+      <button id="prev" class="btn btn-primary">이전</button>
+      <span id="page">1</span>
+      <button id="next" class="btn btn-primary">다음</button>
+    </div>
+
+    <script id="temp_list" type="x-handlebars-template"> 
+      {{#each documents}}
+        <div class ="col-6 col-lg-2 col-md-3" mb-3>
+          <div class = "card">
+            <div class="card-body">
+              <a href="/kakao/book/info?title={{title}}&thumbnail={{thumbnail}}&price={{price}}&authors={{authors}}&&publisher={{publisher}}&isbn={isbn}">
+                <img src="{{funThumbnail thumbnail}}" width="100%" height="200">
+              </a>
+            </div>
+            <div class="card-footer" style="font-size:12px;">
+              <div class="ellipsis">{{title}}</div>
+              <div>{{price}}원</div>
+            </div>
+          </div>
+        </div> 
+      {{/each}}
+    </script>
+    
+    <!--핸들바에서 thumnail 가져오는게 registerHelper이고, 위에서 funThumnail을 사용하는데 매개변수 thumbnail로 해서 아래 같이 사용됨-->
+    <script>
+      Handlebars.registerHelper("funThumbnail", function(thumbnail){
+        if(thumbnail) return thumbnail;
+        else return "/images/noimage.jpeg";
+      })
+    </script>
+
+</div>
+<!--위에 사용된 card 연관 class 들은 bootstrap에서 지정된 양식임.-->
+
+<!--도서 검색은 script 에서-->
+<script>
+    let query="자바";
+    let size=12; // bootstrap에서 가져올 수 있는 page 최대 12개
+    let page = 1;
+    getList();
+
+    //frm은 name이라서 아무 것도 없이. id면 $(#id), class는 $(.class)
+    $(frm).on("submit", function(e){ // 클릭 submit 했을 때
+      e.preventDefault(); // 번쩍임 방지
+      query=$(frm.query).val(); // 기존 value 넣어둔 자바 대신에 submit 시 들어간 value 값 전달
+      if(query==""){        
+        alert("검색어를 입력하세요 !")
+    }else{
+      page=1;
+      getList(); // 내용 호출
+    }
+    });
+
+    /* 위에 a 태그로 쉽게 사용
+    $("#div_list").on("click", "img", function(){ //div_list 안에 있는 이미지 클릭했을 때, (중요) img는 태그 없이 큰 따옴표 2개만 !!
+      location.href="/kakao/book/info";
+    });
+    */
+
+    $("#next").on("click", function(){
+      page++;
+      getList();
+    });
+
+    $("#prev").on("click", function(){
+      page--;
+      getList();
+    });
+
+    function getList(){
+        /* $로 시작하는 건 jquery 사용*/
+        /* $.ajax로 api를 받아와서 사용할 수 있음*/
+        /* name으로 가져올 때는 아무 것도 안 붙고, id 값은 #, 클래스는 . 으로 밸류값을 가져옴*/
+        $.ajax({
+            type:"get",
+            url:"https://dapi.kakao.com/v3/search/book?target=title",
+            data: {query:query, size:size, page:page},
+            headers:{
+                "Authorization": "KakaoAK 7dc21d5852274d162cc3c15163505083"
+            },
+            success:function(data){
+                console.log(data);
+                //f12 - console 에서 data 불러오는 거 보여짐.
+                //아래는 핸들바 이용해서 출력 부분 
+                const temp = Handlebars.compile($("#temp_list").html()); //
+                $("#div_list").html(temp(data)); //위에 만든 div_list로 html 형태로 넘겨서 출력함.
+
+                const last = Math.ceil(data.meta.pageable_count/size)
+                $("#page").html(`${page}/${last}`); //문자와 연결하기 위해 `` 백틱 사용
+
+                if(page==1) $("#prev").attr("disabled", true);
+                else $("#prev").attr("disabled", false);
+
+                if(data.meta.is_end) $("#next").attr("disabled", true);
+                else $("#next").attr("disabled", false);
+            }
+        });
+    }
+</script>
