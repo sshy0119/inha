@@ -1,0 +1,41 @@
+<div class="my-5">
+  <h1 class="text-center mb-5"><%=title%></h1>
+  <div id ="div_list"></div>
+  <script id = "temp_list" type="x-handlebars-template">
+    <table class="table">
+      {{#each .}}
+        <tr>
+          <td><img src="{{thumbnail}}"></td>
+          <td>{{title}}</td>
+          <td>{{price}}</td>
+          <td>{{authors}}</td>
+          <td>{{publisher}}</td>
+          <td>{{contents}}</td>
+        </tr>
+      {{/each}}
+    </table>
+  </script>
+</div>
+
+<script type="module">
+// db 불러오는 거 info.ejs 참조해서 가져옴..
+import { app } from '/javascripts/config.js';   
+    import { getDatabase, onValue, ref} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js"; 
+    // getDatabase, onValue 로 db 밸류값 가져옴.
+    const db = getDatabase(app); // db 사용
+  
+    // 장바구니 목록
+    onValue(ref(db, `cart/${uid}`), snapshot=>{ //cart 밑에 uid에 있는 내용을 snapshot에 가져옴.
+      let rows = []; // 값이 바꾸니 let 사용
+      snapshot.forEach(row=>{
+        rows.push({...row.val()}); // ...은 복제의 역할임. row.val() 값들을 복사해서 rows에 푸쉬해줌.
+      });
+      console.log(rows);
+
+      const temp = Handlebars.compile($("#temp_list").html()); //
+      $("#div_list").html(temp(rows)); //위에 만든 div_list로 html 형태로 넘겨서 출력함.
+      //(중요) temp 양식에 rows를 넣어서 사용함.
+
+    });
+
+</script>

@@ -1,0 +1,72 @@
+<div class="row my-5 justify-content-center p-3">
+  <h1 class="text-center mb-5"><%=title%></h1>
+  <div class="col-md-10 card">
+      <div class="row card-body p-3">
+          <div class="col-lg-4 mb-3 text-center">
+              <img src=<%=info.thumbnail%> width="80%">
+          </div>
+          <div class="col align-self-center">
+              <h5><%=info.title%></h5>
+              <hr>
+              <div class="mb-3">ISBN: <%=info.isbn%></div>
+              <div class="mb-3">가격: <%=info.price%>원</div>
+              <div class="mb-3">저자: <%=info.authors%></div>
+              <div class="mb-3">출판사: <%=info.publisher%>원</div>
+              <div class="my-3">
+                  <button class="btn btn-success px-5 cart">장바구니</button>
+                  <button class="btn btn-warning px-5">바로구매</button>
+              </div>
+          </div>
+          <hr>
+          <div><%=info.contents%></div>
+      </div>
+  </div>
+</div>
+
+
+<script type="module"> 
+    import { app } from '/javascripts/config.js';   // 인증 라이브러리 사용 - 파이어베이스에서 데이터 베이스 가져옴.
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js"; 
+    // getDatabase, ref, set, get은 문법처럼 봐야함. 이미 있는 거 import 해서 씀.
+    const db = getDatabase(app); // db 사용
+
+    const isbn = "<%=info.isbn%>";
+    const title = "<%=info.title%>";
+    const thumbnail = "<%=info.thumbnail%>";
+    const publisher = "<%=info.publisher%>";
+    const authors = "<%=info.authors%>"
+    const contents = "<%=info.contents%>";
+    const price = "<%=info.price%>";
+
+    const info = {isbn, title, thumbnail, publisher, authors, contents, price};
+    console.log(info);
+
+    // 장바구니를 눌렀을 때
+    $(".cart").on("click", async function(){
+       if(email){
+            // 현재 도서를 장바구니에 넣기
+            // 파이어 베이스 db 사용
+            const ref_cart = ref(db, `cart/${uid}/${isbn}`);
+            const snapshot = await get(ref_cart);
+
+            if(snapshot.val()){
+                alert("이미 장바구니에 존재하는 도서입니다.")
+            }else{
+                await set(ref_cart, info);
+                alert("장바구니에 추가되었습니다 !")
+            }
+            // await set(ref(db, "cart/" + uid + "/" + isbn), info); // db에서 cart/uid/isbn에 info 정보를 넣겠다.
+            // 위에 ref 변수 만들어서 윗 줄 사용.
+            // (중요 !) cart는 변수가 아니니까 문자로 쓰고, uid는 안에 내용 까서 쓰는 거라 변수.
+            // isbn도 key값을 쓰는 거라 까서 씀.
+                // 백틱으로 쓰려면 `${uid}/${isbn}' 사용
+       }else {
+            sessionStorage.setItem("target", window.location.href); //웹 브라우저에서 제공되는 공간이 sessionStorage임.
+            // 여기에 target이라는 변수를 만들어서 거기에 주소 저장하겠다.
+            location.href="/users/login"; // 로그인으로 이동
+       }
+
+
+    });
+
+</script>
