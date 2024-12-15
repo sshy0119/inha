@@ -1,0 +1,29 @@
+1주차
+
+bin -> www >> 포트 설정
+
+node_modules -> 모듈들인데 npminstall 하면 설치됨.
+
+package.json은 우리 프로젝트 정보 들어있음. name : web07로 바꿔주는 거 여기.
+
+config.js 에는 db에 있는 거 그대로 복사함.
+
+프로젝트 구동 : nodemon 
+- npm start하면 변동사항이 바로 반영이 안돼서, nodemon 깐 거임.
+
+스타일시트에 ellipis는 webkit-line-clamp는 몇 줄 이상일 때 ... 표시할지 설정임.
+
+var indexRouter = require('./routes/index');
+
+router의 index.js에 'index'는 index.ejs를 의미함.
+
+
+변수 지정할 때는 ? 변수연결할 때는 & 사용.
+              <a href="/kakao/book/info?title={{title}}&thumbnail={{thumbnail}}&price={{price}}&authors={{authors}}&&publisher={{publisher}}&isbn={isbn}">
+
+경로에서 app.js의 라우터 먼저 간 다음에 그 밑에 라우터의 js 파일에 설정된 경로로 찾아들어감.
+
+
+<script type="module">  "module" 이거 시험 문제 !
+
+      {{#each .}}  documents 말고 아무 것도 없을 때는 . 찍음

@@ -1,0 +1,87 @@
+<div>
+  <h1 class="text-center"><%-title%></h1>
+  <div class="row">
+    <div class="col-md-4">
+      <form name="frm" class="text-center">
+        <div class="input-group">
+          <input name="query" value="Node.js" class="form-control">
+          <button class="btn btn-success">검색</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="div_list" class="text-center"></div>
+  <div class="text-center">
+    <button id="prev" class="btn btn-primary">이전</button>
+    <sapn id="page">1</sapn>
+    <button id="next" class="btn btn-primary">다음</button>
+  </div>
+  <script id="temp_list" type="x-handlebars-template">
+    <table class="table table-stripded table-hover">
+      {{#each documents}}
+      <tr>
+        <td><img src="{{thumbnail}}" width='50px'></td>
+        <td>{{title}}</td>
+        <td>{{price}}</td>
+        <td>{{authors}}</td>
+      </tr>  
+      {{/each}}
+    </table>  
+  </script>
+</div>
+
+
+<script>
+  let query=$(frm.query).val();
+  let page=1;
+  let size=5;
+
+  getList();
+
+  $(frm).on("submit", function(e){
+    e.preventDefault();
+    query = $(frm.query).val();
+    if(query==""){
+      alert("검색어를 입력하세요 !")
+    }else{
+      getList();
+    }
+    });
+
+  $("#prev").on("click",function(){
+    page--;
+    getList();
+  })
+
+  $("#next").on("click", function(){
+    page++
+    getList();
+  })
+  
+  function getList(){
+    $.ajax({
+            type:"get",
+            url:"https://dapi.kakao.com/v3/search/book?target=title",
+            data: {query:query, size:size, page:page},
+            headers:{
+                "Authorization": "KakaoAK 7dc21d5852274d162cc3c15163505083"
+            },
+      success:function(data){
+        const temp=Handlebars.compile($("#temp_list").html());
+        $("#div_list").html(temp(data));
+
+        const last = Math.ceil(data.meta.pageable_count/size);
+        $("#page").html(page+"/"+last);
+        
+        if(page==1)
+        $("$prev").attr("disabled",true)
+        else $("#prev").attr("disabled",false)
+
+        if(page==last)
+        $("#next").attr("disabled",true)
+        else $("#next").attr("disabled",false)
+      }
+    });
+  }
+</script>
+
