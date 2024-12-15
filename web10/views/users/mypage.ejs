@@ -1,0 +1,89 @@
+<style>
+    .title {
+        width: 200px;
+    }
+    .photo {
+        border-radius: 50%;
+        cursor: pointer;
+    }
+</style>
+<div class="my-5 row justify-content-center">
+    <h1 class="text-center mb-5">
+        <%=title%>
+    </h1>
+    <form name="frm" class="col-md-8">
+        <div class="input-group mb-3">
+            <div class="input-group-text title justify-content-center">이메일</div>
+            <input name="email" class="form-control" readonly>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-text title justify-content-center">성명</div>
+            <input name="name" class="form-control" value="무기명">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-text title justify-content-center">전화</div>
+            <input name="phone" class="form-control" value="010-1234-5678">
+        </div>
+        <div class="input-group mb-1">
+            <div class="input-group-text title justify-content-center">주소</div>
+            <input name="address1" class="form-control">
+            <button class="btn btn-primary px-3 search" type="button">검색</button>
+        </div>
+        <div class="input-group mb-3">
+            <input name="address2" class="form-control" placeholder="상세주소">
+        </div>
+        <div class="text-center mt-3">
+            <button class="btn btn-primary" type="submit">정보저장</button>
+            <button class="btn btn-secondary" type="reset">저장취소</button>
+        </div>
+    </form> 
+<script type="module">
+    import {app} from '/javascripts/config.js'
+    import {getDatabase, ref, set, onValue} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+    const db = getDatabase(app);
+
+    $(frm.email).val(email); // val 안에 email은 sessionStorage에 있는 email 값 (로그인 된 이메일 값)
+    $(".search").on("click", function(){
+        new daum.Postcode({ //이거 하면 다음(카카오) api 써서 검색 창 뜸
+            oncomplete: function(data){ // 주소 완성이 됐을 때,
+                const address = data.buildingName != "" ? 
+                    `${data.address}(${data.buildingName})` : data.address // 삼항연사자로, api에서 빌딩name 있으면 같이 넣고 vs 없으면 주소만 넣음.
+                $(frm.address1).val(address);
+            }
+        }).open();
+    });
+
+    //정보 읽기
+    onValue(ref(db, `users/${uid}`), snapshot=>{
+        const user=snapshot.val();
+        $(frm.name).val(user.name);
+        $(frm.phone).val(user.phone);
+        $(frm.address1).val(user.address1);
+        $(frm.address2).val(user.address2);
+    });
+
+    $(frm).on("submit", async function(e){
+        e.preventDefault();
+        if(confirm("변경한 정보를 수정합니다.")){
+            const user = {
+                email: email,
+                name: $(frm.name).val(),
+                phone: $(frm.phone).val(),
+                address1:$(frm.address1).val(),
+                address2:$(frm.address2).val()   
+            }
+            await set(ref(db, `users/${uid}`), user); 
+            };
+            alert("저장완료!");
+        }
+    );
+
+    //저장 취소
+    $(frm).on("reset", function(e){
+        e.preventDefault();
+        if(confirm("정보 수정을 취소합니다.")){
+        //    location.href="/users/mypage";
+        location.reload(); // 위에랑 같은 동작임.
+        }
+    });
+</script>
